@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send("🚀 GitOps App Running 3");
+  res.send("🚀 GitOps App Running 4");
 });
 
 app.get("/health", (req, res) => {
