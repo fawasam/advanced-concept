@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: app
-          image: fawaswebcastle/gitops-app:1776281960
+          image: fawaswebcastle/gitops-app:1776283234
           ports:
             - containerPort: 3000
