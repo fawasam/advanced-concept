@@ -1,6 +1,8 @@
 resources:
   - ../../base
 
+namespace: prod
+
 nameSuffix: -prod
 
 patches:
