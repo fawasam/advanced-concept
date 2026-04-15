@@ -1,0 +1,18 @@
+resources:
+  - ../../base
+
+nameSuffix: -dev
+
+patches:
+  - target:
+      kind: Ingress
+      name: gitops-app-ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: gitops-dev.fawasam.in
+
+replicas:
+  - name: gitops-app
+    count: 1
+
