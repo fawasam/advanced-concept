@@ -1,0 +1,47 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2️⃣ Login to DockerHub
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # 3️⃣ Build & Push Docker Image
+      - name: Build and Push Docker Image
+        run: |
+          IMAGE_TAG=$(date +%s)
+          # Point to the Dockerfile in the argocd directory
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/gitops-app:$IMAGE_TAG ./argocd
+          docker push ${{ secrets.DOCKER_USERNAME }}/gitops-app:$IMAGE_TAG
+
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
+      # 4️⃣ Update deployment.yaml
+      - name: Update Kubernetes Manifest
+        run: |
+          # Use | as delimiter to handle possible special characters in image names
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/gitops-app:${IMAGE_TAG}|" gitops-manifests/deployment.yaml
+
+      # 5️⃣ Commit & Push changes
+      - name: Commit and Push changes
+        run: |
+          git config --global user.email "ci@github.com"
+          git config --global user.name "github-actions"
+          git add gitops-manifests/deployment.yaml
+          git commit -m "chore: update image tag to ${IMAGE_TAG} [skip ci]" || echo "No changes"
+          git push
