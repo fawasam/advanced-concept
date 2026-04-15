@@ -25,8 +25,8 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           IMAGE_TAG=$(date +%s)
-          # Point to the Dockerfile in the argocd directory
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/gitops-app:$IMAGE_TAG ./argocd
+          # Point to the Dockerfile in the app directory
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/gitops-app:$IMAGE_TAG ./app
           docker push ${{ secrets.DOCKER_USERNAME }}/gitops-app:$IMAGE_TAG
 
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
@@ -35,13 +35,13 @@ jobs:
       - name: Update Kubernetes Manifest
         run: |
           # Use | as delimiter to handle possible special characters in image names
-          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/gitops-app:${IMAGE_TAG}|" gitops-manifests/deployment.yaml
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/gitops-app:${IMAGE_TAG}|" deploy/deployment.yaml
 
       # 5️⃣ Commit & Push changes
       - name: Commit and Push changes
         run: |
           git config --global user.email "ci@github.com"
           git config --global user.name "github-actions"
-          git add gitops-manifests/deployment.yaml
+          git add deploy/deployment.yaml
           git commit -m "chore: update image tag to ${IMAGE_TAG} [skip ci]" || echo "No changes"
           git push
