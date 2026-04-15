@@ -3,10 +3,8 @@ kind: Ingress
 metadata:
   name: gitops-app-ingress
   namespace: default
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  ingressClassName: nginx
+  ingressClassName: traefik
   rules:
     - host: gitops.fawasam.in
       http:
