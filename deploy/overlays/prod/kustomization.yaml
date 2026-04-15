@@ -13,6 +13,10 @@ patches:
       - op: replace
         path: /spec/rules/0/host
         value: gitops.fawasam.in
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: gitops.fawasam.in
+
 
 replicas:
   - name: gitops-app
